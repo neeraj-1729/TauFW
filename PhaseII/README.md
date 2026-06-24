@@ -127,13 +127,13 @@ Phase-II HLT NanoAOD ──→ [Skim Module] ──→ pico.root ──→ [Plot
 
 ### 1. Configure the era and channel
 
-Update `PicoProducer/samples/Phase2/samples_Phase2.py` — set `storage` to your EOS path
+Update `PicoProducer/samples/PhaseII/samples_PhaseII.py` — set `storage` to your EOS path
 or keep `None` for DAS/xrootd access.
 
 Then register:
 
 ```bash
-pico.py set era Phase2 Phase2/samples_Phase2.py
+pico.py set era PhaseII PhaseII/samples_PhaseII.py
 ```
 ```bash
 pico.py set channel phase2_trigeff PhaseII.ModulePhase2TrigEff
@@ -142,31 +142,31 @@ pico.py set channel phase2_trigeff PhaseII.ModulePhase2TrigEff
 ### 2. Local test run
 
 ```bash
-pico.py run -y Phase2 -c phase2_trigeff -m 1000
+pico.py run -y PhaseII -c phase2_trigeff -m 1000
 ```
 
 ### 3. Submit batch jobs
 
 ```bash
-pico.py submit -y Phase2 -c phase2_trigeff
+pico.py submit -y PhaseII -c phase2_trigeff
 ```
 
 ### 4. Monitor job status
 
 ```bash
-pico.py status -y Phase2 -c phase2_trigeff
+pico.py status -y PhaseII -c phase2_trigeff
 ```
 
 ### 5. Resubmit failed jobs
 
 ```bash
-pico.py resubmit -y Phase2 -c phase2_trigeff
+pico.py resubmit -y PhaseII -c phase2_trigeff
 ```
 
 ### 6. Merge output files
 
 ```bash
-pico.py hadd -y Phase2 -c phase2_trigeff
+pico.py hadd -y PhaseII -c phase2_trigeff
 ```
 
 ---
@@ -217,8 +217,8 @@ TauFW/
 │   │   ├── __init__.py
 │   │   ├── ModulePhase2TrigEff.py        # Unified skim module (all channels)
 │   │   └── Phase2TriggerConfig.py        # Central config: channels, L1, HLT, binning
-│   └── samples/Phase2/
-│       └── samples_Phase2.py             # Sample definitions (used by pico.py)
+│   └── samples/PhaseII/
+│       └── samples_PhaseII.py            # Sample definitions (used by pico.py)
 ├── PhaseII/                              # ★ Plotting tools + documentation
 │   ├── plot_phase2_trigeff.py            # Efficiency plotter (--channel at plot time)
 │   └── README.md                         # This file

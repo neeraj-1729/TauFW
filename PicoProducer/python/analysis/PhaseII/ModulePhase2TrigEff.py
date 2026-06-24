@@ -82,6 +82,12 @@ class ModulePhase2TrigEff(Module):
     self.out.addBranch('reco_mu1_eta',  'f', -9.)
     self.out.addBranch('reco_mu1_phi',  'f', -9.)
 
+    # ─── Reco HLT electrons (from hltElectron, sorted by pT) ──────
+    self.out.addBranch('n_reco_ele',     'i',  0 )
+    self.out.addBranch('reco_ele1_pt',   'f', -1.)
+    self.out.addBranch('reco_ele1_eta',  'f', -9.)
+    self.out.addBranch('reco_ele1_phi',  'f', -9.)
+
     # ─── Precomputed dR values (convenience for plotter) ───────────
     self.out.addBranch('dr_gen_tau1_mu1',      'f', -1.)  # gen tau1 ↔ gen muon
     self.out.addBranch('dr_gen_tau1_ele1',     'f', -1.)  # gen tau1 ↔ gen electron
@@ -92,6 +98,11 @@ class ModulePhase2TrigEff(Module):
     self.out.addBranch('dr_gentau1_recotau1',  'f', -1.)
     self.out.addBranch('dr_gentau2_recotau2',  'f', -1.)
     self.out.addBranch('dr_genmu1_recomu1',    'f', -1.)
+    self.out.addBranch('dr_genele1_recoele1',  'f', -1.)
+    self.out.addBranch('dr_reco_tau1_ele1',    'f', -1.)  # reco tau1 ↔ reco electron
+    # DiTau cross-match dR (for permutation matching)
+    self.out.addBranch('dr_gentau1_recotau2',  'f', -1.)
+    self.out.addBranch('dr_gentau2_recotau1',  'f', -1.)
 
     # ─── Cutflow (basic, channel-independent) ──────────────────────
     self.out.cutflow.addcut('none',         "no cut"            )
@@ -99,6 +110,8 @@ class ModulePhase2TrigEff(Module):
     self.out.cutflow.addcut('has_reco_tau', "+ >=1 HLT tau"     )
     self.out.cutflow.addcut('has_gen_mu',   "+ >=1 gen muon"    )
     self.out.cutflow.addcut('has_reco_mu',  "+ >=1 HLT muon"   )
+    self.out.cutflow.addcut('has_gen_ele',  "+ >=1 gen electron")
+    self.out.cutflow.addcut('has_reco_ele', "+ >=1 HLT electron")
 
 
   def beginJob(self):
@@ -122,8 +135,14 @@ class ModulePhase2TrigEff(Module):
       print(">>> WARNING: HLT branches not found: %s" % ', '.join(HLT_PATHS[n] for n in missing_hlt))
     if missing_l1:
       print(">>> WARNING: L1 branches not found: %s" % ', '.join(L1_SEEDS[n] for n in missing_l1))
-    # Check for HLT electron collection (future)
-    self._has_hlt_ele = ('nhltEle' in branchlist) or ('nhltElectron' in branchlist)
+    # Determine HLT electron collection name
+    if 'nhltElectron' in branchlist:
+      self._hlt_ele_coll = 'hltElectron'
+    elif 'nhltEle' in branchlist:
+      self._hlt_ele_coll = 'hltEle'
+    else:
+      self._hlt_ele_coll = None
+      print(">>> WARNING: No HLT electron collection found (nhltElectron / nhltEle)")
 
 
   def _fill_obj(self, prefix, obj):
@@ -203,6 +222,8 @@ class ModulePhase2TrigEff(Module):
     self.out.n_gen_ele[0] = len(gen_eles)
     if len(gen_eles) >= 1:
       self._fill_obj('gen_ele1', gen_eles[0])
+      if len(gen_taus) >= 1:
+        self.out.cutflow.fill('has_gen_ele')
     else:
       self._clear_obj('gen_ele1')
 
@@ -240,6 +261,22 @@ class ModulePhase2TrigEff(Module):
     else:
       self._clear_obj('reco_mu1')
 
+    # ─── Reco HLT electrons ──────────────────────────────────────────
+    reco_eles = []
+    if self._hlt_ele_coll:
+      for ele in Collection(event, self._hlt_ele_coll):
+        if abs(ele.eta) > ETA_PRE: continue
+        reco_eles.append(ele)
+      reco_eles.sort(key=lambda e: e.pt, reverse=True)
+
+    self.out.n_reco_ele[0] = len(reco_eles)
+    if len(reco_eles) >= 1:
+      self._fill_obj('reco_ele1', reco_eles[0])
+      if len(gen_eles) >= 1 and len(gen_taus) >= 1:
+        self.out.cutflow.fill('has_reco_ele')
+    else:
+      self._clear_obj('reco_ele1')
+
     # ─── Precomputed dR values ─────────────────────────────────────
     # Gen separations
     if len(gen_taus) >= 1 and len(gen_muons) >= 1:
@@ -267,6 +304,12 @@ class ModulePhase2TrigEff(Module):
     else:
       self.out.dr_reco_tau1_mu1[0] = -1.
 
+    if len(reco_taus) >= 1 and len(reco_eles) >= 1:
+      self.out.dr_reco_tau1_ele1[0] = deltaR(reco_taus[0].eta, reco_taus[0].phi,
+                                               reco_eles[0].eta, reco_eles[0].phi)
+    else:
+      self.out.dr_reco_tau1_ele1[0] = -1.
+
     if len(reco_taus) >= 2:
       self.out.dr_reco_tau1_tau2[0] = deltaR(reco_taus[0].eta, reco_taus[0].phi,
                                                reco_taus[1].eta, reco_taus[1].phi)
@@ -291,6 +334,25 @@ class ModulePhase2TrigEff(Module):
                                                reco_muons[0].eta, reco_muons[0].phi)
     else:
       self.out.dr_genmu1_recomu1[0] = -1.
+
+    if len(gen_eles) >= 1 and len(reco_eles) >= 1:
+      self.out.dr_genele1_recoele1[0] = deltaR(gen_eles[0].eta, gen_eles[0].phi,
+                                                 reco_eles[0].eta, reco_eles[0].phi)
+    else:
+      self.out.dr_genele1_recoele1[0] = -1.
+
+    # DiTau cross-match dR (for permutation matching)
+    if len(gen_taus) >= 1 and len(reco_taus) >= 2:
+      self.out.dr_gentau1_recotau2[0] = deltaR(gen_taus[0].eta, gen_taus[0].phi,
+                                                 reco_taus[1].eta, reco_taus[1].phi)
+    else:
+      self.out.dr_gentau1_recotau2[0] = -1.
+
+    if len(gen_taus) >= 2 and len(reco_taus) >= 1:
+      self.out.dr_gentau2_recotau1[0] = deltaR(gen_taus[1].eta, gen_taus[1].phi,
+                                                 reco_taus[0].eta, reco_taus[0].phi)
+    else:
+      self.out.dr_gentau2_recotau1[0] = -1.
 
     # ─── Event info ─────────────────────────────────────────────────
     self.out.evt[0]  = event.event

@@ -73,7 +73,8 @@ CHANNELS = {
     # Reco selection
     'reco_tau_pt': 130.0,  'reco_tau_eta': 2.1,
     # Matching
-    'dr_match':   0.1,
+    'dr_match':      0.1,
+    'dr_separation': 0.0,  # N/A for single tau (no second leg)
     # Object collections
     'reco_tau_collection': 'hltHpsPFTau',
   },
@@ -82,26 +83,21 @@ CHANNELS = {
 
 
 # ─── All L1 Seeds to Monitor ───────────────────────────────────────────────
+# Derived from CHANNELS to avoid duplication; extra seeds added separately.
 # These are stored for every event regardless of channel, to allow
 # cross-channel L1 seed rate comparisons.
 
-L1_SEEDS = {
-  'l1_mutau':    'L1T_PuppiTauTkMuon_42_18',
-  'l1_ditau':    'L1T_DoublePuppiTau_52_52',
-  'l1_etau':     'L1T_PuppiTauTkIsoEle_45_22',
-  'l1_taumet':   'L1T_NNPuppiTauPuppiMet_55_190',
-  'l1_singlemu': 'L1T_SingleTkMuon_22',
-}
+L1_SEEDS = {f'l1_{ch}': cfg['l1_seed']
+            for ch, cfg in CHANNELS.items() if cfg.get('l1_seed')}
+L1_SEEDS['l1_taumet']   = 'L1T_NNPuppiTauPuppiMet_55_190'
+L1_SEEDS['l1_singlemu'] = 'L1T_SingleTkMuon_22'
 
 
 # ─── All HLT Paths to Monitor ──────────────────────────────────────────────
+# Derived from CHANNELS to avoid duplication.
 
-HLT_PATHS = {
-  'hlt_mutau':     'HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1',
-  'hlt_ditau':     'HLT_DoubleMediumDeepTauPFTauHPS35_eta2p1',
-  'hlt_etau':      'HLT_Ele30_WPTight_L1Seeded_LooseDeepTauPFTauHPS30_eta2p1_CrossL1',
-  'hlt_singletau': 'HLT_LooseDeepTauPFTauHPS150_L2NN_eta2p1',
-}
+HLT_PATHS = {f'hlt_{ch}': cfg['hlt_path']
+             for ch, cfg in CHANNELS.items() if cfg.get('hlt_path')}
 
 
 # ─── Binning for Efficiency Plots ──────────────────────────────────────────

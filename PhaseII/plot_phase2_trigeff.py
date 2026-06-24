@@ -119,7 +119,7 @@ def get_channel_info(channel):
 
 def apply_selection(a, cfg, info, has_reco_l2=True):
   """Apply channel gen+reco selection, return masks."""
-  eta_cut = 2.1
+  eta_cut = cfg.get('gen_tau_eta', 2.1)  # Read from config (currently 2.1 for all)
   dR_sep  = cfg['dr_separation']
   dR_match = cfg['dr_match']
 
@@ -156,6 +156,13 @@ def apply_selection(a, cfg, info, has_reco_l2=True):
                (a[f'dr_reco_{l1}_{l2}'] > dR_sep)
     match2 = (a[f'dr_gen{l2}_reco{l2}'] < dR_match) & (a[f'dr_gen{l2}_reco{l2}'] >= 0)
     matched = match1 & match2
+    # DiTau: also try swapped gen-reco permutation (pT ordering can swap)
+    cross_key1 = f'dr_gen{l1}_reco{l2}'
+    cross_key2 = f'dr_gen{l2}_reco{l1}'
+    if cross_key1 in a and cross_key2 in a:
+      match_cross1 = (a[cross_key1] < dR_match) & (a[cross_key1] >= 0)
+      match_cross2 = (a[cross_key2] < dR_match) & (a[cross_key2] >= 0)
+      matched = matched | (match_cross1 & match_cross2)
   else:
     matched = match1
 
@@ -188,7 +195,12 @@ def plot_channel(tree, outdir, sample_label, channel):
       f'reco_{l2}_pt', f'reco_{l2}_eta', f'reco_{l2}_phi',
       f'dr_reco_{l1}_{l2}', f'dr_gen{l2}_reco{l2}'
     ])
-      
+  # DiTau: load cross-match dR branches for permutation matching
+  cross_key1 = f'dr_gen{l1}_reco{l2}'
+  cross_key2 = f'dr_gen{l2}_reco{l1}'
+  if cross_key1 in branchlist and cross_key2 in branchlist:
+    branches.extend([cross_key1, cross_key2])
+
   a, n = tree_to_arrays(tree, branches)
   sel = apply_selection(a, cfg, info, has_reco_l2=has_reco_l2)
 
@@ -216,7 +228,7 @@ def plot_channel(tree, outdir, sample_label, channel):
   print(f"  HLT + Match:      {n_num} ({e:.4f} ± {e_err:.4f})")
 
 
-  # Turn-on: l1 pT (no l1 pT cut)
+  # Turn-on: l1 pT (no gen l1 pT cut; reco pT cut still applied — convention choice)
   den_l1pt = sel['gen_sel_no_l1pt'] & sel['reco_sel']
   num_l1pt = den_l1pt & a[hlt_var].astype(bool) & sel['matched']
   l2_pt_cut = int(cfg[f'gen_{info["l2_cfg"]}_pt'])
@@ -244,11 +256,15 @@ def plot_channel(tree, outdir, sample_label, channel):
            f"{info['title']} HLT Eff. vs {info['l2_name']} $\eta$ [{sample_label}]",
            outdir, f"eff_{channel}_vs_{info['l2_file']}_eta.png")
 
-  # phi distribution for leg 1
+  # phi distributions
   plot_eff(a[f'gen_{l1}_phi'][eff_den], a[f'gen_{l1}_phi'][eff_num], PHI_BINS,
            f"{info['l1_name']} $\phi$",
            f"{info['title']} HLT Eff. vs {info['l1_name']} $\phi$ [{sample_label}]",
            outdir, f"eff_{channel}_vs_{info['l1_file']}_phi.png")
+  plot_eff(a[f'gen_{l2}_phi'][eff_den], a[f'gen_{l2}_phi'][eff_num], PHI_BINS,
+           f"{info['l2_name']} $\phi$",
+           f"{info['title']} HLT Eff. vs {info['l2_name']} $\phi$ [{sample_label}]",
+           outdir, f"eff_{channel}_vs_{info['l2_file']}_phi.png")
 
 
 # ── Main ─────────────────────────────────────────────────────────────────
