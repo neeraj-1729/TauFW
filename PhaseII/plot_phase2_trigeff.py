@@ -215,8 +215,6 @@ def plot_channel(tree, outdir, sample_label, channel):
 
   print(f"\n{'='*60}")
   print(f"{info['title']} Trigger Efficiency — {sample_label}")
-  if not has_reco_l2:
-    print(f"  (Note: Reco {info['l2_name']} not in tree; offline matching is {info['l1_name']} only)")
   print(f"{'='*60}")
   print(f"  Total events:     {n}")
   print(f"  Gen selection:    {np.sum(sel['gen_sel'])}")
