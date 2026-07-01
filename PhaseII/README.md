@@ -58,10 +58,23 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 scram b -j4
 ```
 
-### 3. Clone TauFW
+### 3. Clone TauFW and switch to the Phase-II branch
+
+> **Important:** The Phase-II trigger efficiency code is on the
+> `PhaseII_integration` branch, **not** on `main`. You must switch to it
+> after cloning.
 
 ```bash
 git clone https://github.com/neeraj-1729/TauFW.git TauFW
+```
+```bash
+cd TauFW
+```
+```bash
+git checkout PhaseII_integration
+```
+```bash
+cd ..
 ```
 ```bash
 scram b -j4
