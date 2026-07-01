@@ -218,6 +218,10 @@ python3 plot_phase2_trigeff.py \
 | `eff_<ch>_vs_<var>_pt.png` | pT turn-on curve (no pT cut on plotted leg) |
 | `eff_<ch>_vs_<var>_eta.png` | η efficiency |
 | `eff_<ch>_vs_<var>_phi.png` | φ efficiency |
+| `trigeff_<ch>.pdf` | **Combined PDF** with all plots for the channel in order: HLT eff → L1 eff → HLT fakes → L1 fakes |
+
+> **Note:** The combined PDF is generated automatically alongside the PNGs.
+> Use `--no-pdf` to skip it.
 
 ---
 
