@@ -314,56 +314,102 @@ def plot_channel(tree, outdir, sample_label, channel):
            f"Requiring {pair_lbl} pair",
            outdir, f"eff_l1{channel}_vs_{info['l2_file']}_eta.png")
 
-  # ══ Fake Rate Plots ════════════════════════════════════════════════
+  # ══ HLT Fake Rate Plots ═════════════════════════════════════════════
   # Fake Rate = (Reco Sel. + Trigger + Fail Gen-Reco Match) / Reco Sel.
   # Denominator: reco selection only (no gen requirement).
   # If either leg fails gen-reco matching (dR >= 0.1), event is counted as fake.
   fake_den = sel['reco_sel']
-  fake_num = fake_den & a[hlt_var].astype(bool) & ~sel['matched']
+  fake_num_hlt = fake_den & a[hlt_var].astype(bool) & ~sel['matched']
 
   n_fake_den = np.sum(fake_den)
-  n_fake_num = np.sum(fake_num)
-  f_rate, f_err = eff_err(n_fake_num, n_fake_den)
-  print(f"\n  Fake rate:        {n_fake_num}/{n_fake_den} = {f_rate:.4f} ± {f_err:.4f}")
+  n_fake_num_hlt = np.sum(fake_num_hlt)
+  f_rate_hlt, f_err_hlt = eff_err(n_fake_num_hlt, n_fake_den)
+  print(f"\n  HLT Fake rate:    {n_fake_num_hlt}/{n_fake_den} = {f_rate_hlt:.4f} ± {f_err_hlt:.4f}")
 
-  # Fake rate vs reco pT
-  plot_eff(a[f'reco_{l1}_pt'][fake_den], a[f'reco_{l1}_pt'][fake_num], PT_BINS,
+  # HLT Fake rate vs reco pT
+  plot_eff(a[f'reco_{l1}_pt'][fake_den], a[f'reco_{l1}_pt'][fake_num_hlt], PT_BINS,
            f"Reco {info['l1_name']} $p_T$ [GeV] ({info['l1_reco_coll']})",
-           f"{info['title']} Fake Rate vs {info['l1_name']} $p_T$ [{sample_label}]\n"
+           f"{info['title']} HLT Fake Rate vs {info['l1_name']} $p_T$ [{sample_label}]\n"
            f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
            outdir, f"fake_{channel}_vs_{info['l1_file']}_pt.png", ylabel="Fake Rate")
   if has_reco_l2:
-    plot_eff(a[f'reco_{l2}_pt'][fake_den], a[f'reco_{l2}_pt'][fake_num], PT_BINS,
+    plot_eff(a[f'reco_{l2}_pt'][fake_den], a[f'reco_{l2}_pt'][fake_num_hlt], PT_BINS,
              f"Reco {info['l2_name']} $p_T$ [GeV] ({info['l2_reco_coll']})",
-             f"{info['title']} Fake Rate vs {info['l2_name']} $p_T$ [{sample_label}]\n"
+             f"{info['title']} HLT Fake Rate vs {info['l2_name']} $p_T$ [{sample_label}]\n"
              f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
              outdir, f"fake_{channel}_vs_{info['l2_file']}_pt.png", ylabel="Fake Rate")
 
-  # Fake rate vs reco η
-  plot_eff(a[f'reco_{l1}_eta'][fake_den], a[f'reco_{l1}_eta'][fake_num], ETA_BINS,
+  # HLT Fake rate vs reco η
+  plot_eff(a[f'reco_{l1}_eta'][fake_den], a[f'reco_{l1}_eta'][fake_num_hlt], ETA_BINS,
            f"Reco {info['l1_name']} $\eta$ ({info['l1_reco_coll']})",
-           f"{info['title']} Fake Rate vs {info['l1_name']} $\eta$ [{sample_label}]\n"
+           f"{info['title']} HLT Fake Rate vs {info['l1_name']} $\eta$ [{sample_label}]\n"
            f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
            outdir, f"fake_{channel}_vs_{info['l1_file']}_eta.png", ylabel="Fake Rate")
   if has_reco_l2:
-    plot_eff(a[f'reco_{l2}_eta'][fake_den], a[f'reco_{l2}_eta'][fake_num], ETA_BINS,
+    plot_eff(a[f'reco_{l2}_eta'][fake_den], a[f'reco_{l2}_eta'][fake_num_hlt], ETA_BINS,
              f"Reco {info['l2_name']} $\eta$ ({info['l2_reco_coll']})",
-             f"{info['title']} Fake Rate vs {info['l2_name']} $\eta$ [{sample_label}]\n"
+             f"{info['title']} HLT Fake Rate vs {info['l2_name']} $\eta$ [{sample_label}]\n"
              f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
              outdir, f"fake_{channel}_vs_{info['l2_file']}_eta.png", ylabel="Fake Rate")
 
-  # Fake rate vs reco φ
-  plot_eff(a[f'reco_{l1}_phi'][fake_den], a[f'reco_{l1}_phi'][fake_num], PHI_BINS,
+  # HLT Fake rate vs reco φ
+  plot_eff(a[f'reco_{l1}_phi'][fake_den], a[f'reco_{l1}_phi'][fake_num_hlt], PHI_BINS,
            f"Reco {info['l1_name']} $\phi$ ({info['l1_reco_coll']})",
-           f"{info['title']} Fake Rate vs {info['l1_name']} $\phi$ [{sample_label}]\n"
+           f"{info['title']} HLT Fake Rate vs {info['l1_name']} $\phi$ [{sample_label}]\n"
            f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
            outdir, f"fake_{channel}_vs_{info['l1_file']}_phi.png", ylabel="Fake Rate")
   if has_reco_l2:
-    plot_eff(a[f'reco_{l2}_phi'][fake_den], a[f'reco_{l2}_phi'][fake_num], PHI_BINS,
+    plot_eff(a[f'reco_{l2}_phi'][fake_den], a[f'reco_{l2}_phi'][fake_num_hlt], PHI_BINS,
              f"Reco {info['l2_name']} $\phi$ ({info['l2_reco_coll']})",
-             f"{info['title']} Fake Rate vs {info['l2_name']} $\phi$ [{sample_label}]\n"
+             f"{info['title']} HLT Fake Rate vs {info['l2_name']} $\phi$ [{sample_label}]\n"
              f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\geq$1 leg",
              outdir, f"fake_{channel}_vs_{info['l2_file']}_phi.png", ylabel="Fake Rate")
+
+  # ══ L1 Fake Rate Plots ══════════════════════════════════════════════
+  fake_num_l1 = fake_den & a[l1_var].astype(bool) & ~sel['matched']
+
+  n_fake_num_l1 = np.sum(fake_num_l1)
+  f_rate_l1, f_err_l1 = eff_err(n_fake_num_l1, n_fake_den)
+  print(f"  L1  Fake rate:    {n_fake_num_l1}/{n_fake_den} = {f_rate_l1:.4f} ± {f_err_l1:.4f}")
+
+  # L1 Fake rate vs reco pT
+  plot_eff(a[f'reco_{l1}_pt'][fake_den], a[f'reco_{l1}_pt'][fake_num_l1], PT_BINS,
+           f"Reco {info['l1_name']} $p_T$ [GeV] ({info['l1_reco_coll']})",
+           f"{info['title']} L1 Fake Rate vs {info['l1_name']} $p_T$ [{sample_label}]\n"
+           f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+           outdir, f"fake_l1{channel}_vs_{info['l1_file']}_pt.png", ylabel="Fake Rate")
+  if has_reco_l2:
+    plot_eff(a[f'reco_{l2}_pt'][fake_den], a[f'reco_{l2}_pt'][fake_num_l1], PT_BINS,
+             f"Reco {info['l2_name']} $p_T$ [GeV] ({info['l2_reco_coll']})",
+             f"{info['title']} L1 Fake Rate vs {info['l2_name']} $p_T$ [{sample_label}]\n"
+             f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+             outdir, f"fake_l1{channel}_vs_{info['l2_file']}_pt.png", ylabel="Fake Rate")
+
+  # L1 Fake rate vs reco η
+  plot_eff(a[f'reco_{l1}_eta'][fake_den], a[f'reco_{l1}_eta'][fake_num_l1], ETA_BINS,
+           f"Reco {info['l1_name']} $\\eta$ ({info['l1_reco_coll']})",
+           f"{info['title']} L1 Fake Rate vs {info['l1_name']} $\\eta$ [{sample_label}]\n"
+           f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+           outdir, f"fake_l1{channel}_vs_{info['l1_file']}_eta.png", ylabel="Fake Rate")
+  if has_reco_l2:
+    plot_eff(a[f'reco_{l2}_eta'][fake_den], a[f'reco_{l2}_eta'][fake_num_l1], ETA_BINS,
+             f"Reco {info['l2_name']} $\\eta$ ({info['l2_reco_coll']})",
+             f"{info['title']} L1 Fake Rate vs {info['l2_name']} $\\eta$ [{sample_label}]\n"
+             f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+             outdir, f"fake_l1{channel}_vs_{info['l2_file']}_eta.png", ylabel="Fake Rate")
+
+  # L1 Fake rate vs reco φ
+  plot_eff(a[f'reco_{l1}_phi'][fake_den], a[f'reco_{l1}_phi'][fake_num_l1], PHI_BINS,
+           f"Reco {info['l1_name']} $\\phi$ ({info['l1_reco_coll']})",
+           f"{info['title']} L1 Fake Rate vs {info['l1_name']} $\\phi$ [{sample_label}]\n"
+           f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+           outdir, f"fake_l1{channel}_vs_{info['l1_file']}_phi.png", ylabel="Fake Rate")
+  if has_reco_l2:
+    plot_eff(a[f'reco_{l2}_phi'][fake_den], a[f'reco_{l2}_phi'][fake_num_l1], PHI_BINS,
+             f"Reco {info['l2_name']} $\\phi$ ({info['l2_reco_coll']})",
+             f"{info['title']} L1 Fake Rate vs {info['l2_name']} $\\phi$ [{sample_label}]\n"
+             f"Requiring {pair_lbl} reco pair | Fail gen-reco match on $\\geq$1 leg",
+             outdir, f"fake_l1{channel}_vs_{info['l2_file']}_phi.png", ylabel="Fake Rate")
 
 
 # ── Main ─────────────────────────────────────────────────────────────────
