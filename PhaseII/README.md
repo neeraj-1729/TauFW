@@ -203,7 +203,7 @@ python3 plot_phase2_trigeff.py \
   --input /eos/user/<username>/analysis/Phase2/Zprime/ZprimeToTauTau_M500_phase2_trigeff.root \
   --channel mutau \
   --outdir plots_mutau_zprime/ \
-  --sample-label "Z'→ττ M500 (Phase-II)"
+  --sample-label "ZprimeToTauTau M500 (Phase-II)"
 ```
 ```bash
 # DiTau (same input!)
@@ -211,7 +211,7 @@ python3 plot_phase2_trigeff.py \
   --input /eos/user/<username>/analysis/Phase2/Zprime/ZprimeToTauTau_M500_phase2_trigeff.root \
   --channel ditau \
   --outdir plots_ditau_zprime/ \
-  --sample-label "Z'→ττ M500 (Phase-II)"
+  --sample-label "ZprimeToTauTau M500 (Phase-II)"
 ```
 
 ### Output Plots
