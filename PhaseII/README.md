@@ -152,34 +152,37 @@ pico.py set era PhaseII PhaseII/samples_PhaseII.py
 pico.py set channel phase2_trigeff PhaseII.ModulePhase2TrigEff
 ```
 
+> **Tip:** By default, the commands below will process **all** samples defined in `samples_PhaseII.py`.
+> To process only a specific sample, add the `-s <sample_name>` flag (e.g. `-s VBFHToTauTau`).
+
 ### 2. Local test run
 
 ```bash
-pico.py run -y PhaseII -c phase2_trigeff -m 1000
+pico.py run -y PhaseII -c phase2_trigeff -s <sample_name> -m 1000
 ```
 
 ### 3. Submit batch jobs
 
 ```bash
-pico.py submit -y PhaseII -c phase2_trigeff
+pico.py submit -y PhaseII -c phase2_trigeff -s <sample_name>
 ```
 
 ### 4. Monitor job status
 
 ```bash
-pico.py status -y PhaseII -c phase2_trigeff
+pico.py status -y PhaseII -c phase2_trigeff -s <sample_name>
 ```
 
 ### 5. Resubmit failed jobs
 
 ```bash
-pico.py resubmit -y PhaseII -c phase2_trigeff
+pico.py resubmit -y PhaseII -c phase2_trigeff -s <sample_name>
 ```
 
 ### 6. Merge output files
 
 ```bash
-pico.py hadd -y PhaseII -c phase2_trigeff
+pico.py hadd -y PhaseII -c phase2_trigeff -s <sample_name>
 ```
 
 ---
@@ -199,7 +202,7 @@ all channels** — just change `--channel`:
 python3 plot_phase2_trigeff.py \
   --input /eos/user/<username>/analysis/Phase2/Zprime/ZprimeToTauTau_M500_phase2_trigeff.root \
   --channel mutau \
-  --outdir plots_mutau/ \
+  --outdir plots_mutau_zprime/ \
   --sample-label "Z'→ττ M500 (Phase-II)"
 ```
 ```bash
@@ -207,7 +210,8 @@ python3 plot_phase2_trigeff.py \
 python3 plot_phase2_trigeff.py \
   --input /eos/user/<username>/analysis/Phase2/Zprime/ZprimeToTauTau_M500_phase2_trigeff.root \
   --channel ditau \
-  --outdir plots_ditau/
+  --outdir plots_ditau_zprime/ \
+  --sample-label "Z'→ττ M500 (Phase-II)"
 ```
 
 ### Output Plots

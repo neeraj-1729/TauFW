@@ -33,14 +33,16 @@ samples  = [
     nfilesperjob=1),
 
   # ── gg -> H -> tt ─────────────────────────────────────────────────────
-  # M('ggH','ggHToTauTau',
-  #   "/GluGluHToTauTau_M-125_TuneCP5_14TeV-powheg-pythia8/CAMPAIGN/NANOAODSIM",
-  #   store=storage, url=url, files=filelist, opts=opts),
+  M('ggH','ggHToTauTau',
+    "ggHTT_full",
+    store=storage, url=url, files=[storage+"/ggHTT_merged.root"], opts=opts,
+    nfilesperjob=1),
 
   # ── VBF H -> tt ──────────────────────────────────────────────────────
-  # M('VBF','VBFHToTauTau',
-  #   "/VBFHToTauTau_M125_TuneCP5_14TeV-powheg-pythia8/CAMPAIGN/NANOAODSIM",
-  #   store=storage, url=url, files=filelist, opts=opts),
+  M('VBF','VBFHToTauTau',
+    "vbfHTT_full",
+    store=storage, url=url, files=__import__('glob').glob(storage+"/vbfHTT_full/step2_vbfHTT_*.root"), opts=opts,
+    nfilesperjob=2),
 
   # ── DY -> tt -> mt_h (filtered) ───────────────────────────────────────
   # M('DY','DYToTauTau_MuTauh',
